@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <data name="GenericError" xml:space="preserve">
+    <value>Ocurrió un error.</value>
+  </data>
+    <data name="OperationCancelled" xml:space="preserve">
+    <value>La operación fue cancelada.</value>
+  </data>
+    <data name="IamError.UserNotFound" xml:space="preserve">
+    <value>Usuario no encontrado.</value>
+  </data>
+    <data name="IamError.UsernameAlreadyTaken" xml:space="preserve">
+    <value>El nombre de usuario {0} ya está en uso.</value>
+  </data>
+    <data name="IamError.InvalidCredentials" xml:space="preserve">
+    <value>Nombre de usuario o contraseña inválidos.</value>
+  </data>
+    <data name="IamError.OperationCancelled" xml:space="preserve">
+    <value>La operación de usuario fue cancelada.</value>
+  </data>
+    <data name="IamError.DatabaseError" xml:space="preserve">
+    <value>Ocurrió un error de base de datos durante la operación IAM.</value>
+  </data>
+    <data name="IamError.InternalServerError" xml:space="preserve">
+    <value>Ocurrió un error interno inesperado en IAM.</value>
+  </data>
+    <data name="IamError.ExternalServiceError" xml:space="preserve">
+    <value>Ocurrió un error de servicio externo en IAM.</value>
+  </data>
+
+    <data name="ProfilesError.ProfileNotFound" xml:space="preserve">
+    <value>Perfil no encontrado.</value>
+  </data>
+    <data name="ProfilesError.EmailAlreadyRegistered" xml:space="preserve">
+    <value>La dirección de correo electrónico {0} ya está registrada.</value>
+  </data>
+    <data name="ProfilesError.InvalidProfileData" xml:space="preserve">
+    <value>Datos de perfil inválidos proporcionados.</value>
+  </data>
+    <data name="ProfilesError.OperationCancelled" xml:space="preserve">
+    <value>La operación de perfil fue cancelada.</value>
+  </data>
+    <data name="ProfilesError.DatabaseError" xml:space="preserve">
+    <value>Ocurrió un error de base de datos durante la operación de perfil.</value>
+  </data>
+    <data name="ProfilesError.InternalServerError" xml:space="preserve">
+    <value>Ocurrió un error interno inesperado en Perfiles.</value>
+  </data>
+
+    <data name="PublishingError.CategoryNotFound" xml:space="preserve">
+    <value>Categoría no encontrada.</value>
+  </data>
+    <data name="PublishingError.TutorialNotFound" xml:space="preserve">
+    <value>Tutorial no encontrado.</value>
+  </data>
+    <data name="PublishingError.DuplicateTutorialTitle" xml:space="preserve">
+    <value>Ya existe un tutorial con el título {0}.</value>
+  </data>
+    <data name="PublishingError.OperationCancelled" xml:space="preserve">
+    <value>La operación de publicación fue cancelada.</value>
+  </data>
+    <data name="PublishingError.DatabaseError" xml:space="preserve">
+    <value>Ocurrió un error de base de datos durante la operación de publicación.</value>
+  </data>
+    <data name="PublishingError.InternalServerError" xml:space="preserve">
+    <value>Ocurrió un error interno inesperado en Publicación.</value>
+  </data>
+</root>
