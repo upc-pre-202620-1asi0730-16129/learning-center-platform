@@ -74,6 +74,15 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
 }
 
+//
+var supportedCultures = new [] { "en", "es" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
 app.MapGet("/", () => "Hello World!");
 
 app.Run();
