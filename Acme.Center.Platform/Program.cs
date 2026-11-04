@@ -34,7 +34,7 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 
 // Shared Bounded Context
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+builder.Services.AddScoped<DispatchDomainEventsInterceptor>();
 
 var app = builder.Build();
 
