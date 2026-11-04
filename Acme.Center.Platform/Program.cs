@@ -5,6 +5,7 @@ using Acme.Center.Platform.Shared.Infrastructure.Interfaces.AspNetCore.Configura
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Configuration;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Interceptors;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using Acme.Center.Platform.Shared.Infrastructure.Pipeline.Middleware.Components;
 using Acme.Center.Platform.Shared.Interfaces.Rest.ProblemDetails;
 using Cortex.Mediator.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ builder.Services.AddControllers(options => options.Conventions.Add(new KebabCase
 
 // Add ProblemDetails and ExceptionHandler services
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Add OpenAPI/Scalar documentation services
 builder.Services.AddOpenApi();
@@ -89,7 +91,9 @@ using (var scope = app.Services.CreateScope())
 // Apply CORS policy
 app.UseCors("AllowAllPolicy");
 
-// 
+// Configure the HTTP request pipeline
+app.UseExceptionHandler();
+
 var supportedCultures = new [] { "en", "es" };
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
