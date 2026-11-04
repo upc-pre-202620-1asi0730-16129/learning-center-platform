@@ -83,6 +83,8 @@ var localizationOptions = new RequestLocalizationOptions()
 
 app.UseRequestLocalization(localizationOptions);
 
-app.MapGet("/", () => "Hello World!");
+app.UseHttpsRedirection();
+
+app.MapControllers();
 
 app.Run();
