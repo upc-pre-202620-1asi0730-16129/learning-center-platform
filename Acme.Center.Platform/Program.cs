@@ -9,6 +9,7 @@ using Acme.Center.Platform.Shared.Interfaces.Rest.ProblemDetails;
 using Cortex.Mediator.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,9 @@ builder.Services.AddControllers(options => options.Conventions.Add(new KebabCase
 
 // Add ProblemDetails and ExceptionHandler services
 builder.Services.AddProblemDetails();
+
+// Add OpenAPI/Scalar documentation services
+builder.Services.AddOpenApi();
 
 // Add Database Connection
 
@@ -93,6 +97,13 @@ var localizationOptions = new RequestLocalizationOptions()
     .AddSupportedUICultures(supportedCultures);
 
 app.UseRequestLocalization(localizationOptions);
+
+if (app.Environment.IsDevelopment())
+{
+    // Enable OpenAPI/Scalar documentation endpoints in development environment
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.UseHttpsRedirection();
 
