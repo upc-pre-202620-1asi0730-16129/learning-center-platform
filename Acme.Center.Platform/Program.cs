@@ -53,6 +53,14 @@ builder.Services.AddSingleton<IStringLocalizer<CommonMessages>, StringLocalizer<
 // Register the custom ProblemDetailsFactory
 builder.Services.AddSingleton<ProblemDetailsFactory>();
 
+// Add CORS Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllPolicy",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});
 
 // Dependency Injection
 
@@ -74,7 +82,10 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
 }
 
-//
+// Apply CORS policy
+app.UseCors("AllowAllPolicy");
+
+// 
 var supportedCultures = new [] { "en", "es" };
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
