@@ -5,6 +5,7 @@ using Acme.Center.Platform.Shared.Infrastructure.Interfaces.AspNetCore.Configura
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Configuration;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Interceptors;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using Acme.Center.Platform.Shared.Interfaces.Rest.ProblemDetails;
 using Cortex.Mediator.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -49,7 +50,8 @@ builder.Services.AddSingleton<IStringLocalizer<ErrorMessages>, StringLocalizer<E
 
 builder.Services.AddSingleton<IStringLocalizer<CommonMessages>, StringLocalizer<CommonMessages>>();
 
-
+// Register the custom ProblemDetailsFactory
+builder.Services.AddSingleton<ProblemDetailsFactory>();
 
 
 // Dependency Injection
