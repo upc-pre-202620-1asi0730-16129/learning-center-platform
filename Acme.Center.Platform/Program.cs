@@ -2,6 +2,7 @@ using Acme.Center.Platform.Shared.Domain.Repositories;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Configuration;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Interceptors;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using Cortex.Mediator.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +36,10 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 // Shared Bounded Context
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<DispatchDomainEventsInterceptor>();
+
+// Add Cortex Mediator for Event Handling
+builder.Services.AddCortexMediator(
+    [typeof(Program)]);
 
 var app = builder.Build();
 
