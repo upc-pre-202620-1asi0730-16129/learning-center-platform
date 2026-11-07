@@ -1,3 +1,9 @@
+using Acme.Center.Platform.Publishing.Application.CommandServices;
+using Acme.Center.Platform.Publishing.Application.Internal.CommandServices;
+using Acme.Center.Platform.Publishing.Application.Internal.QueryServices;
+using Acme.Center.Platform.Publishing.Application.QueryServices;
+using Acme.Center.Platform.Publishing.Domain.Repositories;
+using Acme.Center.Platform.Publishing.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
 using Acme.Center.Platform.Resources.Errors;
 using Acme.Center.Platform.Resources.Shared;
 using Acme.Center.Platform.Shared.Domain.Repositories;
@@ -69,6 +75,16 @@ builder.Services.AddCors(options =>
 });
 
 // Dependency Injection
+
+// Publishing Bounded Context 
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
+
+builder.Services.AddScoped<ITutorialCommandService, TutorialCommandService>();
+builder.Services.AddScoped<ITutorialQueryService, TutorialQueryService>();
+
+builder.Services.AddScoped<ICategoryCommandService, CategoryCommandService>();
+builder.Services.AddScoped<ICategoryQueryService, CategoryQueryService>();
 
 // Shared Bounded Context
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
