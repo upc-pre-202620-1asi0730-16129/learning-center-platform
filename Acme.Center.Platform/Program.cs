@@ -1,9 +1,17 @@
+using Acme.Center.Platform.Profiles.Application.CommandServices;
+using Acme.Center.Platform.Profiles.Application.Internal.CommandServices;
+using Acme.Center.Platform.Profiles.Application.Internal.QueryServices;
+using Acme.Center.Platform.Profiles.Application.QueryServices;
+using Acme.Center.Platform.Profiles.Domain.Repositories;
+using Acme.Center.Platform.Profiles.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using Acme.Center.Platform.Profiles.Resources;
 using Acme.Center.Platform.Publishing.Application.CommandServices;
 using Acme.Center.Platform.Publishing.Application.Internal.CommandServices;
 using Acme.Center.Platform.Publishing.Application.Internal.QueryServices;
 using Acme.Center.Platform.Publishing.Application.QueryServices;
 using Acme.Center.Platform.Publishing.Domain.Repositories;
 using Acme.Center.Platform.Publishing.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using Acme.Center.Platform.Publishing.Resources;
 using Acme.Center.Platform.Resources.Errors;
 using Acme.Center.Platform.Resources.Shared;
 using Acme.Center.Platform.Shared.Domain.Repositories;
@@ -62,6 +70,13 @@ builder.Services.AddSingleton<IStringLocalizer<ErrorMessages>, StringLocalizer<E
 
 builder.Services.AddSingleton<IStringLocalizer<CommonMessages>, StringLocalizer<CommonMessages>>();
 
+builder.Services
+    .AddSingleton<IStringLocalizer<ProfilesMessages>,
+        StringLocalizer<ProfilesMessages>>(); // Added for ProfilesMessages
+builder.Services
+    .AddSingleton<IStringLocalizer<PublishingMessages>,
+        StringLocalizer<PublishingMessages>>(); // Added for PublishingMessages
+
 // Register the custom ProblemDetailsFactory
 builder.Services.AddSingleton<ProblemDetailsFactory>();
 
@@ -85,6 +100,12 @@ builder.Services.AddScoped<ITutorialQueryService, TutorialQueryService>();
 
 builder.Services.AddScoped<ICategoryCommandService, CategoryCommandService>();
 builder.Services.AddScoped<ICategoryQueryService, CategoryQueryService>();
+
+
+// Profiles Bounded Context Dependency Injection Configuration
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+builder.Services.AddScoped<IProfileCommandService, ProfileCommandService>();
+builder.Services.AddScoped<IProfileQueryService, ProfileQueryService>();
 
 // Shared Bounded Context
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
