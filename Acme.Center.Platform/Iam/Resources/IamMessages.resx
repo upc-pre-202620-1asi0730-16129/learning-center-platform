@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <data name="WelcomeMessage" xml:space="preserve">
+    <value>Welcome to IAM module!</value>
+  </data>
+    <data name="UserCreatedSuccessfully" xml:space="preserve">
+        <value>User created successfully.</value>
+    </data>
+</root>
