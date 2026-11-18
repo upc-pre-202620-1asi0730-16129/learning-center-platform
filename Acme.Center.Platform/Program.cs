@@ -1,4 +1,17 @@
+using Acme.Center.Platform.Iam.Application.Acl;
+using Acme.Center.Platform.Iam.Application.CommandServices;
+using Acme.Center.Platform.Iam.Application.Internal.CommandServices;
+using Acme.Center.Platform.Iam.Application.Internal.OutboundServices;
+using Acme.Center.Platform.Iam.Application.Internal.QueryServices;
+using Acme.Center.Platform.Iam.Application.QueryServices;
+using Acme.Center.Platform.Iam.Domain.Repositories;
+using Acme.Center.Platform.Iam.Infrastructure.Hashing.BCrypt.Services;
+using Acme.Center.Platform.Iam.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using Acme.Center.Platform.Iam.Infrastructure.Pipeline.Middleware.Extensions;
 using Acme.Center.Platform.Iam.Infrastructure.Tokens.Jwt.Configuration;
+using Acme.Center.Platform.Iam.Infrastructure.Tokens.Jwt.Services;
+using Acme.Center.Platform.Iam.Interfaces.Acl;
+using Acme.Center.Platform.Iam.Resources;
 using Acme.Center.Platform.Profiles.Application.CommandServices;
 using Acme.Center.Platform.Profiles.Application.Internal.CommandServices;
 using Acme.Center.Platform.Profiles.Application.Internal.QueryServices;
@@ -17,19 +30,27 @@ using Acme.Center.Platform.Resources.Errors;
 using Acme.Center.Platform.Resources.Shared;
 using Acme.Center.Platform.Shared.Domain.Repositories;
 using Acme.Center.Platform.Shared.Infrastructure.Interfaces.AspNetCore.Configuration;
+using Acme.Center.Platform.Shared.Infrastructure.Interfaces.AspNetCore.OpenApi;
+using Acme.Center.Platform.Shared.Infrastructure.Mediator.Cortex.Configuration;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Configuration;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Interceptors;
 using Acme.Center.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
 using Acme.Center.Platform.Shared.Infrastructure.Pipeline.Middleware.Components;
-using Acme.Center.Platform.Shared.Interfaces.Rest.ProblemDetails;
+using Acme.Center.Platform.Shared.Infrastructure.Pipeline.Middleware.Extensions;
+using Cortex.Mediator.Commands;
 using Cortex.Mediator.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Scalar.AspNetCore;
+// Added for ProblemDetailsFactory
+// Added for base ProblemDetailsFactory
+// Added for IamMessages
+// Added for ProfilesMessages
+using ProblemDetailsFactory = Acme.Center.Platform.Shared.Interfaces.Rest.ProblemDetails.ProblemDetailsFactory;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// Add services to the container.
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllers(options => options.Conventions.Add(new KebabCaseRouteNamingConvention()))
@@ -39,8 +60,15 @@ builder.Services.AddControllers(options => options.Conventions.Add(new KebabCase
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-// Add OpenAPI/Scalar documentation services
-builder.Services.AddOpenApi();
+
+// Add CORS Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllPolicy",
+        policy => policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
 
 // Add Database Connection
 
@@ -68,9 +96,10 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 
 // Explicitly register IStringLocalizer for ErrorMessages and Commons
 builder.Services.AddSingleton<IStringLocalizer<ErrorMessages>, StringLocalizer<ErrorMessages>>();
-
-builder.Services.AddSingleton<IStringLocalizer<CommonMessages>, StringLocalizer<CommonMessages>>();
-
+builder.Services
+    .AddSingleton<IStringLocalizer<CommonMessages>,
+        StringLocalizer<CommonMessages>>(); // Corrected from Common to Commons
+builder.Services.AddSingleton<IStringLocalizer<IamMessages>, StringLocalizer<IamMessages>>(); // Added for IamMessages
 builder.Services
     .AddSingleton<IStringLocalizer<ProfilesMessages>,
         StringLocalizer<ProfilesMessages>>(); // Added for ProfilesMessages
@@ -81,36 +110,31 @@ builder.Services
 // Register the custom ProblemDetailsFactory
 builder.Services.AddSingleton<ProblemDetailsFactory>();
 
-// Add CORS Policy
-builder.Services.AddCors(options =>
+
+// OpenAPI / Scalar documentation
+builder.Services.AddOpenApi(options =>
 {
-    options.AddPolicy("AllowAllPolicy",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
 });
 
 // Dependency Injection
 
-// Publishing Bounded Context 
+// Shared Bounded Context
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<DispatchDomainEventsInterceptor>();
+
+// Publishing Bounded Context
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ITutorialRepository, TutorialRepository>();
-
-builder.Services.AddScoped<ITutorialCommandService, TutorialCommandService>();
-builder.Services.AddScoped<ITutorialQueryService, TutorialQueryService>();
-
 builder.Services.AddScoped<ICategoryCommandService, CategoryCommandService>();
 builder.Services.AddScoped<ICategoryQueryService, CategoryQueryService>();
-
+builder.Services.AddScoped<ITutorialCommandService, TutorialCommandService>();
+builder.Services.AddScoped<ITutorialQueryService, TutorialQueryService>();
 
 // Profiles Bounded Context Dependency Injection Configuration
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IProfileCommandService, ProfileCommandService>();
 builder.Services.AddScoped<IProfileQueryService, ProfileQueryService>();
-
-// Shared Bounded Context
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<DispatchDomainEventsInterceptor>();
 
 // IAM Bounded Context Injection Configuration
 
@@ -118,9 +142,24 @@ builder.Services.AddScoped<DispatchDomainEventsInterceptor>();
 
 builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserCommandService, UserCommandService>();
+builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IHashingService, HashingService>();
+builder.Services.AddScoped<IIamContextFacade, IamContextFacade>();
+
+// Mediator Configuration
+
+// Add Mediator Injection Configuration
+builder.Services.AddScoped(typeof(ICommandPipelineBehavior<>), typeof(LoggingCommandBehavior<>));
+builder.Services.AddScoped(typeof(ICommandPipelineBehavior<>), typeof(ExceptionHandlingCommandBehavior<>));
+builder.Services.AddScoped(typeof(ICommandPipelineBehavior<>), typeof(TransactionCommandBehavior<>));
+
 // Add Cortex Mediator for Event Handling
 builder.Services.AddCortexMediator(
     [typeof(Program)]);
+
 
 var app = builder.Build();
 
@@ -132,13 +171,10 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
 }
 
-// Apply CORS policy
-app.UseCors("AllowAllPolicy");
-
-// Configure the HTTP request pipeline
+// Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
-var supportedCultures = new [] { "en", "es" };
+var supportedCultures = new[] { "en", "es" };
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
     .AddSupportedCultures(supportedCultures)
@@ -148,10 +184,15 @@ app.UseRequestLocalization(localizationOptions);
 
 if (app.Environment.IsDevelopment())
 {
-    // Enable OpenAPI/Scalar documentation endpoints in development environment
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+// Apply CORS Policy
+app.UseCors("AllowAllPolicy");
+
+// Add Authorization Middleware to Pipeline
+app.UseRequestAuthorization();
 
 app.UseHttpsRedirection();
 
