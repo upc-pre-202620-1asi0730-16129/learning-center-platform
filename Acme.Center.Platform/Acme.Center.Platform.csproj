@@ -4,17 +4,19 @@
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <InvariantGlobalization>false</InvariantGlobalization> <!-- Changed to false -->
+        <LangVersion>14</LangVersion>
+        <Version>1.2.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
-
         <!-- EntityFrameworkCore Database Persistence related packages -->
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational.Design" Version="1.1.6"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <!-- MySQL Database Persistence related packages -->
         <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.12" />
@@ -32,4 +34,17 @@
         <!-- Mediator pattern related packages -->
         <PackageReference Include="Cortex.Mediator" Version="3.1.2"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Iam\Resources\IamMessages.es.resx">
+            <DependentUpon>IamMessages.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Profiles\Resources\ProfilesMessages.es.resx">
+            <DependentUpon>ProfilesMessages.cs</DependentUpon>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Publishing\Resources\PublishingMessages.es.resx">
+            <DependentUpon>PublishingMessages.cs</DependentUpon>
+        </EmbeddedResource>
+    </ItemGroup>
+
 </Project>
